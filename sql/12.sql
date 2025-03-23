@@ -4,3 +4,23 @@
  *
  * Write a SQL query that finds all action fanatics.
  */
+SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+JOIN LATERAL (
+  SELECT COUNT(*) AS action_count
+  FROM (
+    SELECT r.rental_date, cat.name AS category_name
+    FROM rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
+    JOIN film_category fc ON f.film_id = fc.film_id
+    JOIN category cat ON fc.category_id = cat.category_id
+    WHERE r.customer_id = c.customer_id
+    ORDER BY r.rental_date DESC
+    LIMIT 5
+  ) recent
+  WHERE recent.category_name = 'Action'
+) sub ON true
+WHERE sub.action_count >= 3
+ORDER BY c.customer_id;
+

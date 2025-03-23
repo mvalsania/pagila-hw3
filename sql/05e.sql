@@ -18,3 +18,22 @@
  * ```
  * This problem should be solved by a self join on the "film_category" table.
  */
+SELECT block1.title
+FROM (
+  SELECT category.category_id, film.title
+  FROM category
+  JOIN film_category USING (category_id)
+  JOIN film USING (film_id)
+  WHERE film.title = 'AMERICAN CIRCUS'
+) AS block
+LEFT JOIN (
+  SELECT category.category_id, film.title
+  FROM category
+  JOIN film_category USING (category_id)
+  JOIN film USING (film_id)
+) AS block1
+  ON block.category_id = block1.category_id
+GROUP BY block1.title
+HAVING COUNT(*) >= 2
+ORDER BY block1.title;
+
